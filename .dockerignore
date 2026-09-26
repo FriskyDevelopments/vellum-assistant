@@ -63,6 +63,16 @@ clients/macos/src
 !meta/
 !meta/sync-bundled-copies.ts
 
+# Full cli/ and meta/ trees: needed by deploy/zeabur/Dockerfile, which runs
+# the CLI directly from source (bun link) instead of the 3-container split
+# the other Dockerfiles use. Harmless extra context for those images, since
+# they COPY explicit paths and ignore anything else.
+!cli/
+!cli/**
+!meta/**
+!deploy/
+!deploy/**
+
 # Exclude local dependencies and build outputs from included directories.
 assistant/dist/
 assistant/out/

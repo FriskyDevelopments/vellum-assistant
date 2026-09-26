@@ -1,0 +1,159 @@
+# Maps `cli/src/lib/statefulset.ts` DOCKER_STATEFUL_SET_SPEC onto Compose.
+# Assistant owns the network namespace. Gateway and CES join it
+# (`network_mode: service:assistant`), matching `docker run --network=container:<assistant>`.
+# Public ingress is gateway-only: host publishes GATEWAY_INTERNAL_PORT (7830) on assistant.
+#
+# Zeabur PaaS does not deploy Compose YAML and cannot share volumes across
+# services. Use this file on a single Docker host. For Zeabur, use
+# deploy/zeabur/Dockerfile (sibling processes, one volume). See README.md.
+name: vellum-assistant
+
+x-provider-env: &provider-env
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+  FIREWORKS_API_KEY: ${FIREWORKS_API_KEY:-}
+  OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+  AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}
+  MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
+  ATLASCLOUD_API_KEY: ${ATLASCLOUD_API_KEY:-}
+  TOGETHER_API_KEY: ${TOGETHER_API_KEY:-}
+  LITELLM_API_KEY: ${LITELLM_API_KEY:-}
+  OPENCODE_API_KEY: ${OPENCODE_API_KEY:-}
+  BASETEN_API_KEY: ${BASETEN_API_KEY:-}
+  POOLSIDE_API_KEY: ${POOLSIDE_API_KEY:-}
+  TYPESAFE_API_KEY: ${TYPESAFE_API_KEY:-}
+  PERPLEXITY_API_KEY: ${PERPLEXITY_API_KEY:-}
+  BRAVE_API_KEY: ${BRAVE_API_KEY:-}
+  TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+  FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY:-}
+  EXA_API_KEY: ${EXA_API_KEY:-}
+
+services:
+  volume-init:
+    image: busybox:1.37.0
+    user: "0"
+    volumes:
+      - assistant-workspace:/workspace
+      - assistant-ipc:/run/assistant-ipc
+      - gateway-ipc:/run/gateway-ipc
+    command:
+      - sh
+      - -c
+      - chown 1001:1001 /workspace /run/assistant-ipc /run/gateway-ipc && mkdir -p /workspace/.backups && chown 1001:1001 /workspace/.backups
+    restart: "no"
+
+  assistant:
+    build:
+      context: ../..
+      dockerfile: assistant/Dockerfile
+    image: ${VELLUM_ASSISTANT_IMAGE:-vellum-assistant:local}
+    init: true
+    restart: unless-stopped
+    depends_on:
+      volume-init:
+        condition: service_completed_successfully
+    ports:
+      - "${GATEWAY_PORT:-7830}:7830"
+      - "${ASSISTANT_PORT:-7821}:7821"
+    environment:
+      <<: *provider-env
+      IS_CONTAINERIZED: "true"
+      DEBUG_STDOUT_LOGS: "1"
+      VELLUM_CLOUD: docker
+      RUNTIME_HTTP_HOST: "0.0.0.0"
+      RUNTIME_HTTP_PORT: "7821"
+      VELLUM_WORKSPACE_DIR: /workspace
+      VELLUM_BACKUP_DIR: /workspace/.backups
+      VELLUM_BACKUP_KEY_PATH: /workspace/.backup.key
+      CES_CREDENTIAL_URL: http://localhost:8090
+      CES_BOOTSTRAP_SOCKET_DIR: /run/ces-bootstrap
+      GATEWAY_IPC_SOCKET_DIR: /run/gateway-ipc
+      ASSISTANT_IPC_SOCKET_DIR: /run/assistant-ipc
+      CES_SERVICE_TOKEN: ${CES_SERVICE_TOKEN:?set CES_SERVICE_TOKEN in deploy/zeabur/.env}
+      ACTOR_TOKEN_SIGNING_KEY: ${ACTOR_TOKEN_SIGNING_KEY:?set ACTOR_TOKEN_SIGNING_KEY in deploy/zeabur/.env}
+      GUARDIAN_BOOTSTRAP_SECRET: ${GUARDIAN_BOOTSTRAP_SECRET:?set GUARDIAN_BOOTSTRAP_SECRET in deploy/zeabur/.env}
+      VELLUM_ASSISTANT_NAME: ${VELLUM_ASSISTANT_NAME:-vellum}
+      GATEWAY_INTERNAL_URL: http://localhost:7830
+      VELLUM_ENVIRONMENT: ${VELLUM_ENVIRONMENT:-}
+      VELLUM_PLATFORM_URL: ${VELLUM_PLATFORM_URL:-}
+      GATEWAY_TRUST_PROXY: ${GATEWAY_TRUST_PROXY:-true}
+    volumes:
+      - assistant-workspace:/workspace
+      - ces-bootstrap:/run/ces-bootstrap
+      - assistant-ipc:/run/assistant-ipc
+      - gateway-ipc:/run/gateway-ipc
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:7830/readyz"]
+      interval: 5s
+      timeout: 5s
+      retries: 36
+      start_period: 180s
+
+  gateway:
+    build:
+      context: ../..
+      dockerfile: gateway/Dockerfile
+    image: ${VELLUM_GATEWAY_IMAGE:-vellum-gateway:local}
+    init: true
+    user: "0"
+    restart: unless-stopped
+    network_mode: service:assistant
+    depends_on:
+      volume-init:
+        condition: service_completed_successfully
+      assistant:
+        condition: service_started
+    environment:
+      VELLUM_WORKSPACE_DIR: /workspace
+      GATEWAY_SECURITY_DIR: /gateway-security
+      ASSISTANT_HOST: localhost
+      CES_CREDENTIAL_URL: http://localhost:8090
+      GATEWAY_IPC_SOCKET_DIR: /run/gateway-ipc
+      ASSISTANT_IPC_SOCKET_DIR: /run/assistant-ipc
+      GATEWAY_PORT: "7830"
+      RUNTIME_HTTP_PORT: "7821"
+      CES_SERVICE_TOKEN: ${CES_SERVICE_TOKEN:?set CES_SERVICE_TOKEN in deploy/zeabur/.env}
+      ACTOR_TOKEN_SIGNING_KEY: ${ACTOR_TOKEN_SIGNING_KEY:?set ACTOR_TOKEN_SIGNING_KEY in deploy/zeabur/.env}
+      GUARDIAN_BOOTSTRAP_SECRET: ${GUARDIAN_BOOTSTRAP_SECRET:?set GUARDIAN_BOOTSTRAP_SECRET in deploy/zeabur/.env}
+      VELLUM_ENVIRONMENT: ${VELLUM_ENVIRONMENT:-}
+      VELLUM_PLATFORM_URL: ${VELLUM_PLATFORM_URL:-}
+      VELAY_BASE_URL: ${VELAY_BASE_URL:-}
+      GATEWAY_TRUST_PROXY: ${GATEWAY_TRUST_PROXY:-true}
+    volumes:
+      - assistant-workspace:/workspace
+      - gateway-security:/gateway-security
+      - assistant-ipc:/run/assistant-ipc
+      - gateway-ipc:/run/gateway-ipc
+
+  credential-executor:
+    build:
+      context: ../..
+      dockerfile: credential-executor/Dockerfile
+    image: ${VELLUM_CREDENTIAL_EXECUTOR_IMAGE:-vellum-credential-executor:local}
+    init: true
+    restart: unless-stopped
+    network_mode: service:assistant
+    depends_on:
+      volume-init:
+        condition: service_completed_successfully
+      assistant:
+        condition: service_started
+    environment:
+      CES_MODE: managed
+      VELLUM_WORKSPACE_DIR: /workspace
+      CES_BOOTSTRAP_SOCKET_DIR: /run/ces-bootstrap
+      CREDENTIAL_SECURITY_DIR: /ces-security
+      CES_SERVICE_TOKEN: ${CES_SERVICE_TOKEN:?set CES_SERVICE_TOKEN in deploy/zeabur/.env}
+    volumes:
+      - assistant-workspace:/workspace:ro
+      - ces-bootstrap:/run/ces-bootstrap
+      - ces-security:/ces-security
+
+volumes:
+  assistant-workspace:
+  ces-bootstrap:
+  assistant-ipc:
+  gateway-ipc:
+  gateway-security:
+  ces-security:

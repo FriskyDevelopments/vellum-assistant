@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://schema.zeabur.app/template.json
+apiVersion: zeabur.com/v1
+kind: Template
+metadata:
+  name: Vellum Assistant
+spec:
+  description: |
+    Single-container self-hosted Vellum assistant. Daemon, gateway, and
+    credential-executor run as sibling processes in one service so Unix-socket
+    IPC works on Zeabur (volumes cannot be shared across services).
+  tags:
+    - Tool
+  readme: |-
+    # Vellum Assistant (Zeabur)
+
+    One service. One volume at `/data`. HTTP on the gateway port (7830, or
+    Zeabur `PORT`).
+
+    After deploy, set an LLM provider key on the service (Anthropic, OpenAI,
+    or Gemini). Do not commit keys. Then open `/readyz` on the assigned domain.
+
+    Channel tokens (Telegram, Slack) are optional and also set as env vars
+    after deploy.
+  variables:
+    - key: PUBLIC_DOMAIN
+      type: DOMAIN
+      name: Domain
+      description: Domain to bind to the assistant gateway
+  services:
+    - name: vellum-assistant
+      template: GIT
+      domainKey: PUBLIC_DOMAIN
+      spec:
+        source:
+          branch: main
+        ports:
+          - id: web
+            port: 7830
+            type: HTTP
+        volumes:
+          - id: data
+            dir: /data
+        env:
+          ZBPACK_DOCKERFILE_PATH:
+            default: deploy/zeabur/Dockerfile
+            readonly: true
+          VELLUM_DATA_DIR:
+            default: /data
+            readonly: true
+          GATEWAY_PORT:
+            default: "7830"
+          GATEWAY_TRUST_PROXY:
+            default: "true"
+            readonly: true
+          VELLUM_ASSISTANT_NAME:
+            default: vellum
+          ANTHROPIC_API_KEY:
+            default: ""
+          OPENAI_API_KEY:
+            default: ""
+          GEMINI_API_KEY:
+            default: ""
+          TELEGRAM_BOT_TOKEN:
+            default: ""
