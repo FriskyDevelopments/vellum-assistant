@@ -32,7 +32,9 @@ spec:
       domainKey: PUBLIC_DOMAIN
       spec:
         source:
-          branch: main
+          source: GITHUB
+          repo: 1388520760
+          branch: feat/zeabur-one-container
         ports:
           - id: web
             port: 7830
