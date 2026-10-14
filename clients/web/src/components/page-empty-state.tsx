@@ -19,7 +19,10 @@ export function PageEmptyState({
   actions?: ReactNode;
 }) {
   return (
-    <div className="flex h-full min-h-[400px] flex-col items-center justify-center gap-4 px-4 py-24 text-center">
+    <div
+      data-slot="page-empty-state"
+      className="flex h-full min-h-[400px] flex-col items-center justify-center gap-4 px-4 py-24 text-center"
+    >
       <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-[var(--surface-base)]">
         <Icon size={32} className="text-[var(--content-tertiary)]" />
       </div>

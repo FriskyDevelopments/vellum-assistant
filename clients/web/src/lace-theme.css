@@ -1,0 +1,172 @@
+/* Lace skin.
+ *
+ * Turn it off by removing `data-skin="lace"` from the document element, or by
+ * setting localStorage `device:skin` to `plain` before load. Light and dark
+ * still come from the existing theme preference: dark is the unset default,
+ * and choosing Light restores the light palette. Lace ink follows the active
+ * theme so openwork stays light-on-dark or dark-on-light.
+ *
+ * Pattern assets are inline SVG masks. Color and strength are the variables
+ * below, not baked into the artwork.
+ */
+
+:root {
+  --lace-ink: rgba(42, 32, 36, 0.72);
+  --lace-field-opacity: 0.16;
+  --lace-edge-opacity: 0.72;
+  --lace-edge-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2072%2014%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%232A2024%22%20stroke-opacity%3D%220.8%22%20stroke-width%3D%220.9%22%3E%3Cpath%20d%3D%22M0%2011C6%2011%206%203%2012%203s6%208%2012%208%206-8%2012-8%206%208%2012%208%206-8%2012-8%206%208%2012%208%22%2F%3E%3Cpath%20d%3D%22M0%2013C6%2013%206%206%2012%206s6%207%2012%207%206-7%2012-7%206%207%2012%207%206-7%2012-7%206%207%2012%207%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%232A2024%22%20fill-opacity%3D%220.8%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%232A2024%22%20fill-opacity%3D%220.8%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%232A2024%22%20fill-opacity%3D%220.8%22%20stroke%3D%22none%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  --lace-pattern: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2096%2096%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%220.75%22%3E%3Ccircle%20cx%3D%2248%22%20cy%3D%2248%22%20r%3D%2216%22%2F%3E%3Ccircle%20cx%3D%2248%22%20cy%3D%2248%22%20r%3D%227%22%2F%3E%3Cpath%20d%3D%22M48%2032V14M48%2064v18M32%2048H14M64%2048h18M36.5%2036.5%2024%2024M59.5%2036.5%2072%2024M36.5%2059.5%2024%2072M59.5%2059.5%2072%2072%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%223.2%22%2F%3E%3Ccircle%20cx%3D%2280%22%20cy%3D%2216%22%20r%3D%223.2%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2280%22%20r%3D%223.2%22%2F%3E%3Ccircle%20cx%3D%2280%22%20cy%3D%2280%22%20r%3D%223.2%22%2F%3E%3Ccircle%20cx%3D%2248%22%20cy%3D%2216%22%20r%3D%221.6%22%20fill%3D%22%23000%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2248%22%20cy%3D%2280%22%20r%3D%221.6%22%20fill%3D%22%23000%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2248%22%20r%3D%221.6%22%20fill%3D%22%23000%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2280%22%20cy%3D%2248%22%20r%3D%221.6%22%20fill%3D%22%23000%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2233%22%20cy%3D%2233%22%20r%3D%222.1%22%2F%3E%3Ccircle%20cx%3D%2263%22%20cy%3D%2233%22%20r%3D%222.1%22%2F%3E%3Ccircle%20cx%3D%2233%22%20cy%3D%2263%22%20r%3D%222.1%22%2F%3E%3Ccircle%20cx%3D%2263%22%20cy%3D%2263%22%20r%3D%222.1%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  --lace-edge: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2072%2014%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%220.8%22%3E%3Cpath%20d%3D%22M0%2011C6%2011%206%203%2012%203s6%208%2012%208%206-8%2012-8%206%208%2012%208%206-8%2012-8%206%208%2012%208%22%2F%3E%3Cpath%20d%3D%22M0%2013C6%2013%206%206%2012%206s6%207%2012%207%206-7%2012-7%206%207%2012%207%206-7%2012-7%206%207%2012%207%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%23000%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%23000%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%23000%22%20stroke%3D%22none%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+
+html[data-skin="lace"] {
+  --text-label-medium-default-size: 12px;
+  --text-label-small-default-size: 12px;
+}
+
+[data-theme="light"] {
+  --lace-ink: rgba(42, 32, 36, 0.7);
+  --lace-field-opacity: 0.14;
+  --lace-edge-opacity: 0.65;
+  --lace-edge-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2072%2014%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%232A2024%22%20stroke-opacity%3D%220.8%22%20stroke-width%3D%220.9%22%3E%3Cpath%20d%3D%22M0%2011C6%2011%206%203%2012%203s6%208%2012%208%206-8%2012-8%206%208%2012%208%206-8%2012-8%206%208%2012%208%22%2F%3E%3Cpath%20d%3D%22M0%2013C6%2013%206%206%2012%206s6%207%2012%207%206-7%2012-7%206%207%2012%207%206-7%2012-7%206%207%2012%207%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%232A2024%22%20fill-opacity%3D%220.8%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%232A2024%22%20fill-opacity%3D%220.8%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%232A2024%22%20fill-opacity%3D%220.8%22%20stroke%3D%22none%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+
+[data-theme="dark"],
+[data-theme="velvet"] {
+  --lace-ink: rgba(244, 236, 228, 0.9);
+  --lace-field-opacity: 0.2;
+  --lace-edge-opacity: 0.78;
+  --lace-edge-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2072%2014%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23F4ECE4%22%20stroke-opacity%3D%220.9%22%20stroke-width%3D%220.9%22%3E%3Cpath%20d%3D%22M0%2011C6%2011%206%203%2012%203s6%208%2012%208%206-8%2012-8%206%208%2012%208%206-8%2012-8%206%208%2012%208%22%2F%3E%3Cpath%20d%3D%22M0%2013C6%2013%206%206%2012%206s6%207%2012%207%206-7%2012-7%206%207%2012%207%206-7%2012-7%206%207%2012%207%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%23F4ECE4%22%20fill-opacity%3D%220.9%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2236%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%23F4ECE4%22%20fill-opacity%3D%220.9%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%226.5%22%20r%3D%221.25%22%20fill%3D%22%23F4ECE4%22%20fill-opacity%3D%220.9%22%20stroke%3D%22none%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+}
+
+/* Near-black surfaces. Nested `data-theme="light"` still redeclares the light
+ * palette, so a light scope inside a dark page keeps light tokens. */
+html[data-skin="lace"][data-theme="dark"]:not(.native-voice-camera-active):not([data-floating]),
+html[data-skin="lace"] [data-theme="dark"] {
+  --surface-base: #0b0d10;
+  --surface-overlay: #12151a;
+  --surface-lift: #181c22;
+  --surface-sunken: #08090c;
+  --surface-active: #2c343e;
+  --surface-hover: rgba(232, 228, 220, 0.07);
+  --background: #0b0d10;
+  --foreground: #e8e4dc;
+  --border-base: #2a3038;
+  --border-disabled: #1a1e24;
+  --border-element: #6e7884;
+  --border-hover: #3a424c;
+  --border-subtle: #242a32;
+  --border-active: #e8e4dc;
+  --content-default: #e8e4dc;
+  --content-emphasised: #f7f4ef;
+  --content-secondary: #c9c2b6;
+  --content-tertiary: #a8a196;
+  --content-quiet: #c9c2b6;
+  --content-strong: #e4ded4;
+  --content-faint: #a8a196;
+  --content-inset: #0b0d10;
+  --field-bg: #14181e;
+  --segment-track: #222830;
+  --primary-disabled: #2a313a;
+}
+
+html[data-skin="lace"]:not([data-floating]):not(.native-voice-camera-active) {
+  background-color: var(--background);
+}
+
+html[data-skin="lace"]:not([data-floating]):not(.native-voice-camera-active) body {
+  background-color: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+html[data-skin="lace"]:not([data-floating]):not(.native-voice-camera-active)::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--lace-ink);
+  opacity: var(--lace-field-opacity);
+  -webkit-mask-image: var(--lace-pattern);
+  mask-image: var(--lace-pattern);
+  -webkit-mask-size: 168px 168px;
+  mask-size: 168px 168px;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  animation: lace-drift 90s linear infinite;
+}
+
+@keyframes lace-drift {
+  from {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+  to {
+    -webkit-mask-position: 168px 168px;
+    mask-position: 168px 168px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-skin="lace"]::before {
+    animation: none;
+  }
+}
+
+/* A painted strip, not a positioned pseudo-element, so it does not change
+ * how these surfaces are positioned or clipped. */
+html[data-skin="lace"] [data-slot="card"],
+html[data-skin="lace"] [data-slot="side-menu"],
+html[data-skin="lace"] [data-slot="chat-composer"],
+html[data-skin="lace"] [data-slot="chat-main"],
+html[data-skin="lace"] [data-slot="sidebar-shell"],
+html[data-skin="lace"] [data-slot="chat-layout-header"] {
+  background-image: var(--lace-edge-image);
+  background-repeat: repeat-x;
+  background-position: top center;
+  background-size: auto 12px;
+}
+
+html[data-skin="lace"] [data-slot="side-menu-separator"],
+html[data-skin="lace"] hr {
+  height: 10px;
+  border: 0;
+  background-color: var(--lace-ink);
+  opacity: var(--lace-edge-opacity);
+  -webkit-mask-image: var(--lace-edge);
+  mask-image: var(--lace-edge);
+  -webkit-mask-size: 72px 10px;
+  mask-size: 72px 10px;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+}
+
+html[data-skin="lace"] [data-slot="empty-state"],
+html[data-skin="lace"] [data-slot="page-empty-state"],
+html[data-skin="lace"] [data-slot="chat-empty-state"],
+html[data-skin="lace"] [data-slot="sidebar-empty-state"] {
+  position: relative;
+  isolation: isolate;
+}
+
+html[data-skin="lace"] [data-slot="empty-state"]::before,
+html[data-skin="lace"] [data-slot="page-empty-state"]::before,
+html[data-skin="lace"] [data-slot="chat-empty-state"]::before,
+html[data-skin="lace"] [data-slot="sidebar-empty-state"]::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--lace-ink);
+  opacity: 0.45;
+  -webkit-mask-image: var(--lace-pattern);
+  mask-image: var(--lace-pattern);
+  -webkit-mask-size: 120px 120px;
+  mask-size: 120px 120px;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}

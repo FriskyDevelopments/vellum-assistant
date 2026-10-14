@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@vellumai/design-library/tokens.css";
+@import "./lace-theme.css";
 
 /* Capacitor mobile shell variant. Keys off the data-native-platform marker
  * set by initNativePlatformAttributes() at boot. Deliberately :is(), not

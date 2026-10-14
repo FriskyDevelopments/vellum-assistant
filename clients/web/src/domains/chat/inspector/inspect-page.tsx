@@ -233,7 +233,7 @@ function Inspector({ conversationId, messageId }: InspectorProps): ReactNode {
         callCount={data ? logs.length : null}
       />
       <div
-        className="flex min-h-0 flex-1"
+        className="flex min-h-0 flex-1 md:flex-row-reverse"
         style={{ borderTop: "1px solid var(--border-base)" }}
       >
         {isLoadingContext ? (
@@ -741,7 +741,7 @@ function Loaded({
         className="hidden w-64 shrink-0 overflow-y-auto md:block"
         style={{
           background: "var(--surface-base)",
-          borderRight: "1px solid var(--border-base)",
+          borderLeft: "1px solid var(--border-base)",
         }}
       >
         <CallRail

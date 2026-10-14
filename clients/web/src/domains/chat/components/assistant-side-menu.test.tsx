@@ -440,7 +440,7 @@ describe("AssistantSideMenu · drawer inset", () => {
     }
   });
 
-  /* The handle occupies the rail's last 6px, and a section card is its own
+  /* The handle occupies the rail's inner 6px, and a section card is its own
      drag handle, so a card running under it would resize the rail on a grab
      meant to reorder the section. */
   test("a resizable rail holds the handle's strip clear of the cards", () => {
@@ -455,7 +455,7 @@ describe("AssistantSideMenu · drawer inset", () => {
       throw new Error("expected the side menu root");
     }
 
-    expect(nav.className).toContain("pr-[6px]");
+    expect(nav.className).toContain("pl-[6px]");
   });
 
   test("the overlay keeps the sheet's own padding", () => {
@@ -623,20 +623,24 @@ describe("AssistantSideMenu · footer slot behavior", () => {
     expect(html).toContain("Preferences");
   });
 
-  test("the rail footer carries no separator", () => {
+  test("the rail secondary menu sits in the header", () => {
     const conversations = [
       makeConversation({ conversationId: "a", title: "Alpha" }),
     ];
     const container = parse(renderMenu({ conversations }));
-    const footer = container.querySelector<HTMLElement>(
-      '[data-slot="side-menu-footer"]',
+    const header = container.querySelector<HTMLElement>(
+      '[data-slot="side-menu-header"]',
     );
 
-    if (!footer) {
-      throw new Error("expected the rail footer");
+    if (!header) {
+      throw new Error("expected the rail header");
     }
+    expect(header.textContent).toContain("Preferences");
     expect(
-      footer.querySelectorAll('[data-slot="side-menu-separator"]'),
+      container.querySelector('[data-slot="side-menu-footer"]'),
+    ).toBeNull();
+    expect(
+      header.querySelectorAll('[data-slot="side-menu-separator"]'),
     ).toHaveLength(0);
   });
 });
