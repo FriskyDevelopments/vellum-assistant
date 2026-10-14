@@ -26,7 +26,10 @@ export function SidebarSectionEmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-[var(--app-spacing-sm)] px-[var(--app-spacing-md)] pt-[var(--app-spacing-sm)] pb-[var(--app-spacing-md)] text-center">
+    <div
+      data-slot="sidebar-empty-state"
+      className="flex flex-col items-center gap-[var(--app-spacing-sm)] px-[var(--app-spacing-md)] pt-[var(--app-spacing-sm)] pb-[var(--app-spacing-md)] text-center"
+    >
       <Typography
         variant="body-small-default"
         className="text-[var(--content-secondary)]"

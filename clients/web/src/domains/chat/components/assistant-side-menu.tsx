@@ -611,6 +611,7 @@ export function AssistantSideMenu({
     <ConversationListProvider value={listContext}>
       <SideMenu
         ariaLabel={t("assistantSideMenu.navAria")}
+        edge={variant === "rail" ? "end" : "start"}
         collapsed={collapsed}
         variant={variant}
         width={width}
@@ -623,13 +624,14 @@ export function AssistantSideMenu({
            is a full-bleed sheet whose inset is all that keeps content off the
            screen edges.
 
-           The resize handle sits in the rail's last 6px, and the cards are
-           their own drag handles for section reordering, so the scrollport
-           holds that strip clear: overlapped, a grab on a card's right edge
-           resizes the rail instead of picking the section up. */
+           The resize handle sits in the rail's leading 6px (the edge that
+           faces the chat), and the cards are their own drag handles for
+           section reordering, so the scrollport holds that strip clear:
+           overlapped, a grab on a card's inner edge resizes the rail instead
+           of picking the section up. */
         className={cn(
           "relative h-full border-0 bg-transparent",
-          variant === "rail" && (isResizable ? "p-0 pr-[6px]" : "p-0"),
+          variant === "rail" && (isResizable ? "p-0 pl-[6px]" : "p-0"),
         )}
       >
         <SideMenu.Header>
@@ -667,7 +669,10 @@ export function AssistantSideMenu({
               </div>
             </div>
           ) : (
-            builtInNav
+            <>
+              {footerAction}
+              {builtInNav}
+            </>
           )}
         </SideMenu.Header>
 
@@ -794,14 +799,6 @@ export function AssistantSideMenu({
             onClose={onClose}
             onHeightChange={setOverlayBottomColumnHeight}
           />
-        ) : footerAction ? (
-          /* Every entry in this sidebar is a pill on the page background, and
-             a shape like that is already delimited: a line above the last one
-             would divide a column that reads as grouped without it. The
-             footer's own top padding is the whole separation, and `mt-auto`
-             on `SideMenu.Footer` is what holds it at the bottom while the
-             list scrolls in `SideMenu.Body` above it. */
-          <SideMenu.Footer>{footerAction}</SideMenu.Footer>
         ) : null}
       </SideMenu>
     </ConversationListProvider>

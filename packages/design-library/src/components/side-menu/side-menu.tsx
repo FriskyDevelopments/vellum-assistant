@@ -29,7 +29,8 @@ import type { CustomPropertyStyle } from "../../utils/custom-property-style";
  * SideMenu primitive — a docked application navigation rail.
  *
  * Two variants:
- * - `rail` (default) — desktop, docked left. Supports a `collapsed` state
+ * - `rail` (default): desktop, docked to `edge` (`start` unless the caller
+ *   passes `end`). Supports a `collapsed` state
  *   that shrinks the rail to a column one icon tile wide. When collapsed,
  *   section titles, sublists, labels, badges, and trailing icons are
  *   suppressed via a shared context so consumers never conditionally render
@@ -61,16 +62,18 @@ export type SideMenuVariant = "rail" | "overlay";
 
 interface SideMenuContextValue {
   collapsed: boolean;
-  /** Content-level collapsed — lags behind `collapsed` when expanding so
+  /** Content-level collapsed. Lags behind `collapsed` when expanding so
    *  labels appear after the width transition finishes. */
   contentCollapsed: boolean;
   variant: SideMenuVariant;
+  edge: "start" | "end";
 }
 
 const SideMenuContext = createContext<SideMenuContextValue>({
   collapsed: false,
   contentCollapsed: false,
   variant: "rail",
+  edge: "start",
 });
 
 function useSideMenuContext(): SideMenuContextValue {
@@ -209,6 +212,11 @@ export interface SideMenuProps extends ComponentProps<"nav"> {
   collapsed?: boolean;
   /** `rail` = desktop docked; `overlay` = mobile full-bleed. */
   variant?: SideMenuVariant;
+  /**
+   * Which side of the row the rail occupies. `end` places the resize handle
+   * on the inner edge and opens collapsed tooltips toward the content.
+   */
+  edge?: "start" | "end";
   /** Required for the `navigation` landmark role. */
   ariaLabel: string;
   /** Custom width in pixels (rail variant only). Ignored when collapsed. */
@@ -301,6 +309,7 @@ function SideMenuRoot({
   ariaLabel,
   collapsed = false,
   variant = "rail",
+  edge = "start",
   width,
   onWidthChange,
   minWidth = SIDE_MENU_MIN_WIDTH,
@@ -332,7 +341,7 @@ function SideMenuRoot({
   const navRef = useRef<HTMLElement>(null);
   const setNav = useMemo(() => mergeRefs(navRef, ref), [ref]);
   const { handleProps, isResizing, paneId } = useResizablePane({
-    side: "start",
+    side: edge,
     defaultSize: width ?? minWidth,
     minSize: minWidth,
     maxSize: maxWidth,
@@ -350,7 +359,12 @@ function SideMenuRoot({
 
   return (
     <SideMenuContext
-      value={{ collapsed: effectiveCollapsed, contentCollapsed, variant }}
+      value={{
+        collapsed: effectiveCollapsed,
+        contentCollapsed,
+        variant,
+        edge,
+      }}
     >
       <nav
         ref={setNav}
@@ -377,9 +391,17 @@ function SideMenuRoot({
         {showResizeHandle ? (
           <PaneResizeHandle
             {...handleProps}
-            className="absolute right-0 top-0 bottom-0 z-10 w-[6px] group/resize"
+            className={cn(
+              "absolute top-0 bottom-0 z-10 w-[6px] group/resize",
+              edge === "end" ? "left-0" : "right-0",
+            )}
           >
-            <div className="pointer-events-none absolute right-0 top-2 bottom-2 w-[2px] rounded-full bg-[var(--content-tertiary)] opacity-0 transition-opacity group-hover/resize:opacity-100 group-focus-visible/resize:opacity-100" />
+            <div
+              className={cn(
+                "pointer-events-none absolute top-2 bottom-2 w-[2px] rounded-full bg-[var(--content-tertiary)] opacity-0 transition-opacity group-hover/resize:opacity-100 group-focus-visible/resize:opacity-100",
+                edge === "end" ? "left-0" : "right-0",
+              )}
+            />
           </PaneResizeHandle>
         ) : null}
       </nav>
@@ -939,7 +961,10 @@ function SideMenuItem({
 
   const withTooltip = (element: ReactNode) =>
     showStyledTooltip ? (
-      <Tooltip content={tooltipContent} side="right">
+      <Tooltip
+        content={tooltipContent}
+        side={ctx.edge === "end" ? "left" : "right"}
+      >
         {element}
       </Tooltip>
     ) : (

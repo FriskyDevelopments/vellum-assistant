@@ -3,7 +3,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu as MenuIcon,
-  PanelLeft,
+  PanelRight,
   Search,
 } from "lucide-react";
 import { useCallback, useEffect, type ReactNode } from "react";
@@ -235,14 +235,7 @@ export function ChatLayoutHeader({
             // controls also leave the tab order and accessibility tree.
             inert={controlsHidden || undefined}
             className={`flex items-center gap-2 transition-[min-width,opacity] duration-300 ease-in-out max-md:shrink-0${controlsHidden ? " pointer-events-none opacity-0" : controlsDimmed ? " opacity-40" : ""}`}
-            style={{
-              // `minWidth` reserves the sidebar column on desktop only. The
-              // Electron inset clears the inline traffic lights at any width.
-              ...(isMobile
-                ? {}
-                : { minWidth: collapsed ? 48 : (sidebarWidth ?? 230) }),
-              ...macosTrafficLightStyle,
-            }}
+            style={macosTrafficLightStyle}
           >
             {isMobile ? (
               <Button
@@ -254,17 +247,7 @@ export function ChatLayoutHeader({
                 tooltip={t("chatLayoutHeader.openNavigationAria")}
                 onClick={toggleSidebar}
               />
-            ) : (
-              <Button
-                variant="ghost"
-                iconOnly={<PanelLeft />}
-                aria-label={t("chatLayoutHeader.toggleSidebarAria")}
-                aria-expanded={!collapsed}
-                aria-controls="chat-side-menu"
-                tooltip={t("chatLayoutHeader.toggleSidebarAria")}
-                onClick={toggleSidebar}
-              />
-            )}
+            ) : null}
             {!isMobile ? (
               <>
                 <Button
@@ -315,11 +298,27 @@ export function ChatLayoutHeader({
               them or push the trailing controls off-screen. */}
           <div
             inert={controlsHidden || undefined}
-            className={`flex shrink-0 items-center gap-2 max-md:justify-end transition-opacity duration-300${controlsHidden ? " pointer-events-none opacity-0" : controlsDimmed ? " opacity-40" : ""}`}
+            className={`flex shrink-0 items-center justify-end gap-2 transition-[min-width,opacity] duration-300 ease-in-out max-md:justify-end${controlsHidden ? " pointer-events-none opacity-0" : controlsDimmed ? " opacity-40" : ""}`}
+            style={
+              isMobile
+                ? undefined
+                : { minWidth: collapsed ? 48 : (sidebarWidth ?? 230) }
+            }
           >
             {topBarRightLeading}
             {searchButton}
             {topBarRightSlot}
+            {!isMobile ? (
+              <Button
+                variant="ghost"
+                iconOnly={<PanelRight />}
+                aria-label={t("chatLayoutHeader.toggleSidebarAria")}
+                aria-expanded={!collapsed}
+                aria-controls="chat-side-menu"
+                tooltip={t("chatLayoutHeader.toggleSidebarAria")}
+                onClick={toggleSidebar}
+              />
+            ) : null}
           </div>
         </>
       )}

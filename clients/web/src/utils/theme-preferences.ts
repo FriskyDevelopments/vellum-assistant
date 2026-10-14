@@ -17,14 +17,14 @@ function normalizeThemePreference(
   if (value === "velvet") {
     return velvetEnabled ? "velvet" : disabledVelvetFallback;
   }
-  return "system";
+  return "dark";
 }
 
 export function readStoredThemePreference(
   options: NormalizeThemeOptions,
 ): ThemePreference {
   if (typeof window === "undefined") {
-    return "system";
+    return "dark";
   }
   const raw = getDeviceSetting("theme", "");
   return normalizeThemePreference(raw || null, options);
