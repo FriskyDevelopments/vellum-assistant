@@ -32,7 +32,7 @@ export function ChatLayoutFrame({
     ? "flex-col"
     : isPopout
       ? "flex-col"
-      : "flex-col gap-4 p-4 md:flex-row";
+      : "flex-col gap-4 p-4 md:flex-row-reverse";
   const mainClass = !isMobile && isPopout ? "p-4" : "";
 
   return (
@@ -43,6 +43,7 @@ export function ChatLayoutFrame({
         {!isMobile && !isPopout ? desktopNavigation : null}
         <main
           key="chat-main"
+          data-slot="chat-main"
           className={`relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden ${mainClass} ${mainRoomClass}`}
         >
           {/* The route remains mounted while the voice or sleep surface holds

@@ -36,7 +36,7 @@ export function ChatEmptyState({
   return (
     // Extra bottom padding over the top: the greeting reads as its own
     // group with clear air above the composer (Figma: New-App 7471-25035).
-    <div className="pt-8 pb-16">
+    <div data-slot="chat-empty-state" className="pt-8 pb-16">
       <div className="mx-auto w-full max-w-[var(--chat-max-width)] px-3 sm:px-6">
         {/* The slot reserves the headline's own line box at both type sizes,
             so the busy indicator standing in for a greeting that has not

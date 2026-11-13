@@ -160,7 +160,10 @@ export function SidebarShell({
       ) : null}
 
       {/* Card chrome — desktop only */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:rounded-[12px] md:border md:border-[var(--border-base)] md:bg-[var(--surface-overlay)]">
+      <div
+        data-slot="sidebar-shell"
+        className="flex min-h-0 flex-1 flex-col overflow-hidden md:rounded-[12px] md:border md:border-[var(--border-base)] md:bg-[var(--surface-overlay)]"
+      >
         {/* Desktop header */}
         <div className="hidden shrink-0 items-center justify-between gap-4 px-6 py-5 md:flex">
           <div className="flex min-w-0 items-center gap-3">
@@ -179,7 +182,7 @@ export function SidebarShell({
         </div>
 
         {/* Body — sidebar + content */}
-        <div className="flex min-h-0 flex-1 overflow-hidden">
+        <div className="flex min-h-0 flex-1 overflow-hidden md:flex-row-reverse">
           {!isMobile ? (
             <aside
               className="w-64 shrink-0 overflow-y-auto"

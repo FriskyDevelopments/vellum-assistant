@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-skin="lace" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="robots" content="noindex, nofollow" />
@@ -99,7 +99,7 @@
         var theme =
           window.localStorage.getItem("device:theme") ||
           window.localStorage.getItem("vellum_theme") ||
-          "system";
+          "dark";
         var prefersDark =
           window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -108,6 +108,11 @@
           theme === "dark" ||
           (theme === "system" && prefersDark);
         var root = document.documentElement;
+        if (window.localStorage.getItem("device:skin") === "plain") {
+          root.removeAttribute("data-skin");
+        } else {
+          root.setAttribute("data-skin", "lace");
+        }
         root.setAttribute("data-theme", shouldBeDark ? "dark" : "light");
         root.classList.toggle("dark", shouldBeDark);
         root.classList.remove("velvet");
